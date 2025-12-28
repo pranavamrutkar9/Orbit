@@ -7,6 +7,9 @@ const connectDB= require('./config/db')
 const app = express()
 
 const authRoute = require("./routes/authRoute")
+const userRoute = require("./routes/userRoute")
+const actionRoute = require("./routes/actionRoute")
+// const reportRoute = require("./routes/reportRoute")
 
 // Middleware for cors
 app.use(
@@ -23,8 +26,8 @@ app.use(express.urlencoded({ extended: true }))
 
 //Routes
 app.use("/api/auth", authRoute)
-// app.use("/api/users", userRoute)
-// app.use("/api/actions", actionRoute)
+app.use("/api/users", userRoute)
+app.use("/api/actions", actionRoute)
 // app.use("/api/reports", reportRoute)
 
 app.get("/", (req, res) => {
