@@ -1,0 +1,38 @@
+node_modules
+.env
+uploads/
+
+# dependencies
+node_modules/
+
+# env
+.env
+.env.*.local
+
+# uploads / user files
+backend/uploads/
+frontend/uploads/
+uploads/
+
+# build / dist
+dist/
+build/
+.next/
+out/
+
+# logs and coverage
+*.log
+npm-debug.log*
+yarn-error.log*
+coverage/
+
+# OS / editors
+.DS_Store
+Thumbs.db
+.vscode/
+.idea/
+
+# caches
+.cache/
+.parcel-cache/
+.eslintcache
