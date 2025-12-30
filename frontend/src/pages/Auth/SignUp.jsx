@@ -1,9 +1,14 @@
-import React, { useState } from 'react'
+import React, { useContext, useState } from 'react'
 import AuthLayout from '../../components/layouts/AuthLayout'
 import { validateEmail } from '../../utils/helper'
 import ProfilePhotoSelector from '../../components/Inputs/ProfilePhotoSelector'
 import Input from '../../components/Inputs/Input'
-import { Link } from 'react-router-dom'
+import { Link, useNavigate } from 'react-router-dom'
+import axios from 'axios'
+import axiosInstance from '../../utils/axiosInstance'
+import { API_PATH } from '../../utils/apiPath'
+import { UserContext } from '../../context/userContext'
+import uploadImage from '../../utils/uploadImage'
 
 const SignUp = () => {
   const [profilePic, setProfilePic] = useState(null)
@@ -13,8 +18,12 @@ const SignUp = () => {
   const [adminInviteToken, setAdminInviteToken] = useState("")
   const [error, setError] = useState("")
 
-  const handleSignUp = (e) => {
+  const { updateUser } = useContext(UserContext)
+  const navigate = useNavigate()
+
+  const handleSignUp = async (e) => {
     e.preventDefault()
+    let profileImageUrl= ''
 
     if (!fullName) {
       setError("Please enter your name")
@@ -31,7 +40,42 @@ const SignUp = () => {
     setError("")
 
     //sign up api call
+    try {
+      if (profilePic) {
+        const imgUploadRes = await uploadImage(profilePic)
+        profileImageUrl = imgUploadRes.imageUrl || ""
+      }
 
+      const response = await axiosInstance.post(API_PATH.AUTH.REGISTER, {
+        fullName,
+        email,
+        password,
+        profileImageUrl,
+        adminInviteToken,
+      })
+
+      const { token, role } = response.data
+
+      if (token) {
+        localStorage.setItem("token", token)
+        updateUser(response.data)
+
+        if (role === "admin") {
+          navigate("/admin/dashboard")
+        } else {
+          navigate("/user/dashboard")
+        }
+      }
+
+
+
+    } catch (error) {
+      if(error.response && error.response.data.message){
+        setError(error.response.data.message)
+      } else{
+        setError("Something went wrong, please try again later.")
+      }
+    }
   }
 
   return (
@@ -84,7 +128,7 @@ const SignUp = () => {
 
             <p className='text-[13px] text-slate-800 mt-3'>
               Already have an account?{" "}
-              <Link className='font-medium text-primary underline' to="/signup">SignUp</Link>
+              <Link className='font-medium text-primary underline' to="/login">Login</Link>
             </p>
         </form>
       </div>

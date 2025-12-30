@@ -30,6 +30,8 @@ app.use("/api/users", userRoute)
 app.use("/api/actions", actionRoute)
 app.use("/api/reports", reportRoute)
 
+app.use("/uploads", express.static(path.join(__dirname, "uploads")))
+
 app.get("/", (req, res) => {
     res.send("Hello World")
 })

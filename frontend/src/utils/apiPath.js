@@ -32,6 +32,6 @@ export const API_PATH = {
         EXPORT_USERS : "/api/reports/export/users"
     },
     IMAGE:{
-        UPLOAD_IMAGE: "api/auth/upload-image"
+        UPLOAD_IMAGE: "/api/auth/upload-image"
     }
 }
