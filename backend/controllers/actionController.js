@@ -362,7 +362,7 @@ const getUserDashboardData = async(req, res)=>{
         const actionDistribution = actionStatuses.reduce((acc, status)=>{
             const formattedKey = status.replace(/\s+/g, "")
             acc[formattedKey] = 
-                actionDistributionRaw.find((item) => itme._id === status)?.count || 0
+                actionDistributionRaw.find((item) => item._id === status)?.count || 0
             return acc
         }, {})
         actionDistribution["All"]=totalActions
