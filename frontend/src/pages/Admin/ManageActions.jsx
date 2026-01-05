@@ -47,6 +47,23 @@ const ManageActions = () => {
   }
 
   const handleDownloadReport = async () => {
+    try {
+      const response = await axiosInstance.get(API_PATH.REPORTS.EXPORT_ACTIONS, {
+        responseType: 'blob'
+      })
+
+      const url = window.URL.createObjectURL(new Blob([response.data]))
+      const link = document.createElement('a')
+      link.href = url
+      link.setAttribute('download', 'actions.xlsx')
+      document.body.appendChild(link)
+      link.click()
+      link.parentNode.removeChild(link)
+      window.URL.revokeObjectURL(url)
+    } catch (error) {
+      console.error("Error downloading report:", error)
+      toast.error("Error downloading report")
+    }
   }
 
   useEffect(() => {

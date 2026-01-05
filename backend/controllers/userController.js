@@ -11,21 +11,24 @@ const getUsers = async (req, res)=>{
 
         const usersWithActionCounts = await Promise.all(
             users.map(async (user)=>{
-                const pendingActions = await Action.countDocuments({
-                    assignedTo: user._id,
-                    status: "pending"
-                })
-                const inProgressActions = await Action.countDocuments({
-                    assignedTo: user._id,
-                    status: "In Progress"
-                })
-                const completedActions = await Action.countDocuments({
-                    assignedTo: user._id,
-                    status: "Completed"
+                const actions = await Action.find({ assignedTo: user._id })
+                
+                let pendingActions = 0
+                let inProgressActions = 0
+                let completedActions = 0
+
+                actions.forEach((action) => {
+                    const totalItems = action.actChecklist.length
+                    const completedCount = action.actChecklist.filter((item)=>item.completed).length
+                    const progress = totalItems > 0 ? Math.round((completedCount/totalItems)*100) : 0
+
+                    if(progress === 100) completedActions++
+                    else if(progress > 0) inProgressActions++
+                    else pendingActions++
                 })
 
                 return {
-                    ...user._doc, // user object is not added insted user document is added
+                    ...user._doc,
                     pendingActions,
                     inProgressActions,
                     completedActions

@@ -6,60 +6,60 @@ const Action = require("../models/Action")
 const getActions = async(req, res)=>{
     try {
         const {status} = req.query
-        let filter = {}
 
-        if(status){
-            filter.status = status
-        }
-
+        // Fetch all actions first, then filter in memory based on calculated status
         let actions;
         if(req.user.role === "admin"){
-            actions = await Action.find(filter).populate(
+            actions = await Action.find({}).populate(
                 "assignedTo",
                 "name email profileImageUrl"
             )
         } else{
-            actions = await Action.find({...filter, assignedTo: req.user.id}).populate(
+            actions = await Action.find({ assignedTo: req.user.id}).populate(
                 "assignedTo",
                 "name email profileImageUrl"
             )
         }
 
         // add completed act checklist count
-        actions = await Promise.all(
-            actions.map(async (action)=>{
+        const processedActions = actions.map((action)=>{
                 const completedCount = action.actChecklist.filter(
                     (item)=>item.completed
                 ).length
-                return { ...action._doc, completedActCount: completedCount }
+                const totalItems = action.actChecklist.length
+                const progress = totalItems > 0 ? Math.round((completedCount/totalItems)*100) : 0
+
+                let derivedStatus = action.status
+                if(progress === 100){
+                    derivedStatus = "Completed"
+                } else if(progress > 0){
+                    derivedStatus = "In Progress"
+                } else {
+                    derivedStatus = "Pending"
+                }
+
+                return { 
+                    ...action._doc, 
+                    completedActCount: completedCount, 
+                    progress, 
+                    status: derivedStatus 
+                }
             })
-        )
 
         // status summary count
-        const allActions = await Action.countDocuments(
-            req.user.role === "admin" ? {} : { assignedTo: req.user._id }
-        )
+        const allActions = processedActions.length
+        const pendingActions = processedActions.filter((a)=>a.status === "Pending").length
+        const inProgressActions = processedActions.filter((a)=>a.status === "In Progress").length
+        const completedActions = processedActions.filter((a)=>a.status === "Completed").length
 
-        const pendingActions = await Action.countDocuments({
-            ...filter,
-            status: "Pending",
-            ...(req.user.role !== "admin" && { assignedTo: req.user._id })
-        })
-
-        const inProgressActions = await Action.countDocuments({
-            ...filter,
-            status: "In Progress",
-            ...(req.user.role !== "admin" && { assignedTo: req.user._id })
-        })
-
-        const completedActions = await Action.countDocuments({
-            ...filter,
-            status: "Completed",
-            ...(req.user.role !== "admin" && { assignedTo: req.user._id })
-        })
+        // Filter based on requested status
+        let filteredActions = processedActions
+        if(status){
+            filteredActions = processedActions.filter((a)=>a.status === status)
+        }
 
         res.json({
-            actions,
+            actions: filteredActions,
             statusSummary: {
                 allActions,
                 pendingActions,
@@ -151,6 +151,18 @@ const updateAction = async(req, res)=>{
             action.assignedTo = req.body.assignedTo
         }
 
+        const completedCount = action.actChecklist.filter((item)=>item.completed).length
+        const totalItems = action.actChecklist.length
+        action.progress = totalItems > 0 ? Math.round((completedCount/totalItems)*100) : 0
+
+        if(action.progress === 100){
+            action.status = "Completed"
+        } else if(action.progress > 0){
+            action.status = "In Progress"
+        } else{
+            action.status = "Pending"
+        }
+
         const updatedAction = await action.save()
         res.json({message: "Action updated successfully", updatedAction})
     } catch (error) {
@@ -235,7 +247,7 @@ const updateActChecklist = async(req, res)=>{
         action.progress = totalItems>0 ? Math.round((completedCount/action.actChecklist.length)*100) : 0
 
         // auto mark action as completed
-        if(action.progess === 100){
+        if(action.progress === 100){
             action.status = "Completed"
         } else if(action.progress > 0){
             action.status = "In Progress"

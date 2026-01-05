@@ -98,7 +98,7 @@ const exportUserReports = async(req, res)=>{
         }
        })
 
-       const workbook = excelJS.Workbook()
+       const workbook = new excelJS.Workbook()
        const worksheet = workbook.addWorksheet("Users Actions Report")
 
        worksheet.columns = [
@@ -127,7 +127,7 @@ const exportUserReports = async(req, res)=>{
         res.status(200).end()
        })
     } catch (error) {
-        res.staus(500).json({ message: "Error Exporting users", error: error.message })
+        res.status(500).json({ message: "Error Exporting users", error: error.message })
     }
 }
 
