@@ -35,9 +35,29 @@
 }
 
 .btn-primary{
-  @apply w-full text-sm font-medium text-white bg-primary shadow-lg shadow-orange-800/50 rounded-md p-[10px] hover:bg-secondary hover:shadow-secondary cursor-pointer transition-all duration-300 ease-in-out active:scale-98
+  @apply w-full text-sm font-medium text-white bg-primary shadow-lg shadow-orange-800/50 rounded-md p-2.5 hover:bg-secondary hover:shadow-secondary cursor-pointer transition-all duration-300 ease-in-out active:scale-98
 }
 
 .card{
   @apply bg-white p-6 rounded-2xl shadow-md shadow-gray-100 border border-gray-200/50
+}
+
+.card-btn{
+  @apply flex items-center justify-center gap-3 text-[12px] font-medium text-gray-700 hover:text-primary bg-gray-50 hover:bg-secondary px-4 py-1.5 rounded-lg border border-gray-200/50 cursor-pointer
+}
+
+.card-btn-fill{
+ @apply flex items-center justify-center gap-3 text-[12px] font-medium text-white hover:text-primary bg-primary hover:bg-secondary px-4 py-1.5 rounded-lg border cursor-pointer
+}
+
+.add-btn{
+  @apply w-full flex items-center justify-center gap-1.5 text-sm font-medium text-secondary whitespace-nowrap bg-primary hover:scale-101 px-4 py-2 cursor-pointer rounded-lg
+}
+
+.form-card{
+  @apply bg-white p-6 rounded-lg shadow-md shadow-gray-100 border border-gray-200/50
+}
+
+.form-input{
+  @apply w-full text-sm text-black outline-none bg-white border border-slate-100 px-2.5 py-3 rounded-md mt-2 placeholder:text-gray-500
 }

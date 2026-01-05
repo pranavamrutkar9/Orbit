@@ -15,15 +15,15 @@ export const SIDE_MENU_DATA = [
     },
     {
         id: "02",
-        label: "Manage Tasks",
+        label: "Manage Actions",
         icon: LuClipboardCheck,
-        path: "/admin/tasks",
+        path: "/admin/actions",
     },
     {
         id: "03",
-        label: "Create Task",
+        label: "Create Action",
         icon: LuSquarePlus,
-        path: "/admin/create-task",
+        path: "/admin/create-action",
     },
     {
         id: "04",
@@ -48,9 +48,9 @@ export const SIDE_MENU_USER_DATA = [
     },
     {
         id: "02",
-        label: "My Tasks",
+        label: "My Actions",
         icon: LuClipboardCheck,
-        path: "/user/tasks",
+        path: "/user/actions",
     },
     {
         id: "05",
