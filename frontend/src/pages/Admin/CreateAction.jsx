@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import DashboardLayout from '../../components/layouts/DashboardLayout'
 import { PRIORITY_DATA } from '../../utils/data'
 import axiosInstance from '../../utils/axiosInstance'
@@ -11,6 +11,8 @@ import SelectDropdown from '../../components/Inputs/SelectDropdown'
 import SelectUsers from '../../components/Inputs/SelectUsers'
 import ActListInput from '../../components/Inputs/ActListInput'
 import AddAttachmentsInput from '../../components/Inputs/AddAttachmentsInput'
+import Modal from './../../components/Modal';
+import DeleteAlert from '../../components/DeleteAlert'
 
 const CreateAction = () => {
   const location = useLocation();
@@ -67,6 +69,7 @@ const CreateAction = () => {
       })
       toast.success("Action Created Successfully")
       navigate("/admin/actions")
+      clearData()
     } catch (error) {
       console.error("Error creating action:", error)
       toast.error("Error creating action")
@@ -76,7 +79,40 @@ const CreateAction = () => {
     }
   }
 
-  const updateAction = async () => { }
+  const updateAction = async () => {
+    setLoading(true)
+
+    try {
+      const actChecklist = actionData.actChecklist?.map((item)=>{
+        const prevActCheckList = currentAction?.actChecklist || []
+        const matchedAct = prevActCheckList.find((act)=> act.title == item)
+
+        return {
+          title: item,
+          completed: matchedAct?.completed || false
+        }
+      })
+
+      const response = await axiosInstance.put(
+        API_PATH.ACTIONS.UPDATE_ACTION(actionId),
+        {
+          ...actionData,
+          dueDate: new Date(actionData.dueDate).toISOString(),
+          actChecklist: actChecklist,
+        }
+      )
+
+      toast.success("Action Updated Successfully")
+      navigate("/admin/actions")
+      clearData()
+    } catch (error) {
+      console.error("Error updating action:", error)
+      toast.error("Error updating action")
+      setLoading(false)
+    } finally {
+      setLoading(false)
+    }
+  }
 
   const handleSubmit = async (e) => {
     setError(null)
@@ -107,9 +143,52 @@ const CreateAction = () => {
     createAction()
   }
 
-  const getActionDetailsById = async () => { }
+  const getActionDetailsById = async () => {
+    try {
+      const response = await axiosInstance.get(
+        API_PATH.ACTIONS.GET_ACTION_BY_ID(actionId)
+      )
 
-  const deleteAction = async () => { }
+      if(response.data){
+        const actionInfo = response.data
+        setCurrentAction(actionInfo)
+
+        setActionData((prevState)=>({
+          title: actionInfo.title,
+          description: actionInfo.description,
+          priority: actionInfo.priority,
+          dueDate: actionInfo.dueDate
+            ? moment(actionInfo.dueDate).format("YYYY-MM-DD")
+            : null,
+          assignedTo: actionInfo.assignedTo?.map((item)=> item?._id) || [],
+          actChecklist: 
+            actionInfo?.actChecklist?.map((item)=>item.title) || [],
+          attachments: actionInfo?.attachments || []
+        }))
+      }
+    } catch (error) {
+      console.error("Error fetching action details: ", error)
+    }
+  }
+
+  const deleteAction = async () => {
+    try {
+      await axiosInstance.delete(API_PATH.ACTIONS.DELETE_ACTION(actionId))
+      setOpenDeleteAlert(false)
+      toast.success("Action Deleted Successfully")
+      navigate("/admin/actions")
+    } catch (error) {
+
+    }
+  }
+
+  useEffect(() => {
+    if(actionId){
+      getActionDetailsById(actionId)
+    }
+    return () => {}
+  }, [actionId])
+  
 
   return (
     <DashboardLayout activeMenu="Create Action">
@@ -245,6 +324,18 @@ const CreateAction = () => {
           </div>
         </div>
       </div>
+
+
+      <Modal
+        isOpen={openDeleteAlert}
+        onClose={() => setOpenDeleteAlert(false)}
+        title="Delete Action"
+      >
+        <DeleteAlert
+          content="Are you sure you want to delete this action?"
+          onDelete={()=>deleteAction()}
+        />
+      </Modal>
     </DashboardLayout>
   )
 }
