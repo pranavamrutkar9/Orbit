@@ -3,7 +3,7 @@ import { UserContext } from '../../context/userContext'
 import { useNavigate } from 'react-router-dom'
 import { SIDE_MENU_DATA, SIDE_MENU_USER_DATA } from '../../utils/data'
 
-const SideMenu = ({ activeMenu }) => {
+const SideMenu = ({ activeMenu, isOpen }) => {
     const { user, clearUser } = useContext(UserContext)
     const [sideMenuData, setSideMenuData] = useState([])
 
@@ -31,7 +31,7 @@ const SideMenu = ({ activeMenu }) => {
     }, [user])
     
   return (
-    <div className='w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 sticky top-15.25 z-20'>
+    <div className={`w-64 h-[calc(100vh-61px)] bg-white border-r border-gray-200/50 z-20 shrink-0 md:block md:sticky md:top-15.25 ${isOpen ? 'block fixed left-0 top-15.25' : 'hidden'}`}>
         <div className="flex flex-col mb-7 pt-5 items-center justify-center ">
             <div className="relative">
                 <img 

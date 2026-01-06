@@ -54,7 +54,7 @@ const exportActionReports = async(req, res)=>{
             res.status(200).end()
         })
     } catch (error) {
-        res.staus(500).json({ message: "Error Exporting actions", error: error.message })
+        res.status(500).json({ message: "Error Exporting actions", error: error.message })
     }
 }
 

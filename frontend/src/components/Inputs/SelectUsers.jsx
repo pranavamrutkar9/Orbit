@@ -70,7 +70,7 @@ const SelectUsers = ({ selectedUsers, setSelectedUsers }) => {
                 <div className='space-y-4 h-[60vh] overflow-y-auto'>
                     {allUsers.map((user) => (
                         <div
-                            key={user.id}
+                            key={user._id}
                             className='flex items-center gap-4 p-3 border-b border-gray-200'
                         >
                             <img

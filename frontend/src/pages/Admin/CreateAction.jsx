@@ -178,7 +178,8 @@ const CreateAction = () => {
       toast.success("Action Deleted Successfully")
       navigate("/admin/actions")
     } catch (error) {
-
+      console.error("Error deleting Action: ", error)
+      toast.error("Unable to delete Action")
     }
   }
 
@@ -261,7 +262,7 @@ const CreateAction = () => {
                 <input
                   placeholder="Create App UI"
                   className="form-input"
-                  value={actionData.dueDate}
+                  value={actionData.dueDate || ""}
                   onChange={({ target }) =>
                     handleValueChange("dueDate", target.value)
                   }

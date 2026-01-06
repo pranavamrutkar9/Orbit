@@ -37,6 +37,10 @@ const SignUp = () => {
       setError("Please enter a password")
       return
     }
+    if(!profilePic){
+      setError("Please provide an Avatar or Profile Photo")
+      return
+    }
     setError("")
 
     //sign up api call
